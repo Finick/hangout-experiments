@@ -16,11 +16,13 @@
 // depends on the JavaScript API Client, which is currently in alpha as well.
 
 // API key from the Google API Console
-// You do not need to set this if you aren't making any unauthenticated calls
+// You can leave this as null if you are running inside the gadget.
 var apiKey = null;
 
-// Lay out whatever scopes you want here in an array
-var scopes = ['https://www.googleapis.com/auth/plus.me'];
+// Lay out the hangout scopes here.
+var scopes = ['https://www.googleapis.com/auth/plus.me',
+	      'https://www.googleapis.com/auth/hangout.av',
+	      'https://www.googleapis.com/auth/hangout.participants'];
 
 /** Run authorization call in either with or without popup
  * @param {boolean} isImmediate Use immedate mode for authorization.
@@ -86,6 +88,11 @@ function makeGPlusApiCall() {
           var heading = document.createElement('h4');
           var nameHeading = document.createElement('h2');
           var image = document.createElement('img');
+
+	  // Note that these values, URL and displayName
+	  // are already visible in the Hangouts API 
+	  // as part of the Participant data structure.
+	  // We are using these ONLY as an example.
           image.src = resp.image.url;
           nameHeading.appendChild(document.createTextNode(resp.displayName));
           heading.appendChild(image);
