@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    	<!-- 
+    	
+    	Some portions of this code:
+
+        The MIT License
+
+        Copyright (c) 2010-2012 Three.js authors.
+
+        Permission is hereby granted, free of charge, to any person
+        obtaining a copy of this software and associated documentation
+        files (the "Software"), to deal in the Software without
+        restriction, including without limitation the rights to use,
+        copy, modify, merge, publish, distribute, sublicense, and/or
+        sell copies of the Software, and to permit persons to whom the
+        Software is furnished to do so, subject to the following
+        conditions:
+
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the
+        Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+        KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+        WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+        PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+        COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+        OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        
+        
+        
+        All other code licensed under the Apache License, Version 2.0 (the
+        "License"); you may not use this file except in compliance
+        with the License. You may obtain a copy of the License at
+        
+        http://www.apache.org/licenses/LICENSE-2.0
+        
+        Unless required by applicable law or agreed to in writing,
+        software distributed under the License is distributed on an
+        "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+        either express or implied. See the License for the specific
+        language governing permissions and limitations under the
+        License
+         
+    	-->
+    	<Module>
+    	  <ModulePrefs title="Proxied Hangout" height="200" width="550">
+    	  <Require feature="dynamic-height"/>
+    	  <Require feature="rpc"/>
+          <Require feature="views" />
+    	</ModulePrefs>
+    	<Content type="html"><![CDATA[
+    	  <!DOCTYPE html>
+
+<script src="https://talkgadget.google.com/hangouts/_/api/hangout.js?v=1.1" ></script>
+<script src="https://mediakit001.appspot.com/static/three.js"></script>
+
+<script>
+var camera, scene, renderer;
+
+// Scene objects
+var tContainer, cube, plane, eyeCube, mouth, group;
+
+var volume = 0;
+var lastEvent;
+var lastRoll, lastPan, lastTilt, lastScale, lastX;
+
+function initScene() {
+  tContainer = document.createElement('div');
+  document.body.appendChild(tContainer);
+
+  var info = document.createElement('div');
+  info.style.position = 'absolute';
+  info.style.top = '10px';
+  info.style.width = '100%';
+  info.style.textAlign = 'center';
+  info.innerHTML = 'Move your head!';
+  tContainer.appendChild(info);
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(70,
+      window.innerWidth / window.innerHeight, 1, 1000);
+  camera.position.y = 150;
+  camera.position.z = 500;
+  scene.add(camera);
+
+  // Cube
+  var materials = [];
+
+  group = new THREE.Object3D();
+
+  for (var i = 0; i < 6; i++) {
+    // Make different faces different colors
+    if (i == 4) {
+      materials.push(new THREE.MeshBasicMaterial({color: 0x11EE99}));
+    } else if (i == 5) {
+      materials.push(new THREE.MeshBasicMaterial({color: 0x22FFAA}));
+    } else {
+      materials.push(new THREE.MeshBasicMaterial({color: 0x00AA55}));
+    }
+  }
+
+  cube = new THREE.Mesh(new THREE.CubeGeometry(
+      200, 200, 200, 1, 1, 1, materials), new THREE.MeshFaceMaterial());
+  cube.position.y = 0;
+  group.add(cube);
+
+  // Define different matierals for the eyes
+  var materials2 = [];
+  for (i = 0; i < 6; i++) {
+    if (i == 4) {
+      materials2.push(new THREE.MeshBasicMaterial({color: 0xFF0000}));
+    } else if (i == 5) {
+      materials2.push(new THREE.MeshBasicMaterial({color: 0xAA0000}));
+    } else {
+      materials2.push(new THREE.MeshBasicMaterial({color: 0x110000}));
+    }
+  }
+
+  // Eyes
+  eyeCube = new THREE.Mesh(new THREE.CubeGeometry(
+      20, 20, 20, 1, 1, 1, materials2), new THREE.MeshFaceMaterial());
+  eyeCube.position.y = 60;
+  eyeCube.position.x = -50;
+  eyeCube.position.z = 130;
+
+  group.add(eyeCube);
+
+  eyeCube = new THREE.Mesh(new THREE.CubeGeometry(20, 20, 20,
+      1, 1, 1, materials2), new THREE.MeshFaceMaterial());
+  eyeCube.position.y = 60;
+  eyeCube.position.x = 50;
+  eyeCube.position.z = 130;
+  group.add(eyeCube);
+
+  // Mouth
+  mouth = new THREE.Mesh(new THREE.CubeGeometry(100, 20, 20,
+      1, 1, 1, materials2), new THREE.MeshFaceMaterial());
+  mouth.position.x = 0;
+  mouth.position.y = -50;
+  mouth.position.z = 130;
+  group.add(mouth);
+
+  // Shadow
+  plane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),
+      new THREE.MeshBasicMaterial({color: 0xe0e0e0}));
+  scene.add(plane);
+
+  renderer = new THREE.CanvasRenderer();
+  renderer.sortObjects = false;
+  renderer.sortElements = false;
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  group.position.y = 150;
+  scene.add(group);
+  tContainer.appendChild(renderer.domElement);
+}
+
+/** We use smoothing in this app, so we need to set up the default
+ * values for the window.
+ * @param {Number} num # of frames of smoothing to use.*/
+function setupWindows(num) {
+  lastRoll = [];
+  lastPan = [];
+  lastTilt = [];
+  lastScale = [];
+  lastX = [];
+  for (var i = 0; i < num; i++) {
+    lastRoll.push(0);
+    lastPan.push(0);
+    lastTilt.push(0);
+    lastX.push(0);
+    lastScale.push(1.0);
+  }
+}
+
+/** Smoothing using uneven weighting
+ * @param {array} array of values to smooth.
+ * @return {Number} the weighed smoothed value. */
+function computeWeightedWindow(array) {
+  var len = array.length;
+
+  var totalCount = 0;
+  var sumSoFar = 0;
+
+  for (var i = 0; i < len; i++) {
+    totalCount += (len - i);
+    sumSoFar += array[i] * (len - i);
+  }
+
+  return sumSoFar / totalCount;
+}
+
+/** Draws the entire head.  We use smoothing to make it less jumpy. */
+function render() {
+  plane.rotation.y = group.rotation.y = -computeWeightedWindow(lastPan);
+  group.rotation.x = -computeWeightedWindow(lastTilt);
+  group.rotation.z = computeWeightedWindow(lastRoll);
+
+  group.position.z = 1000 * computeWeightedWindow(lastScale);
+  plane.position.z = 1000 * computeWeightedWindow(lastScale);
+
+  group.position.x = -500 * computeWeightedWindow(lastX);
+  plane.position.x = -500 * computeWeightedWindow(lastX);
+
+  renderer.render(scene, camera);
+}
+
+/** Called once per frame */
+function animate() {
+  // This is defined in three.js.
+  requestAnimationFrame(animate);
+
+  render();
+}
+
+/** Keep track of latest volume.
+ * @param {Object} event a gapi.hangout.av.VolumesChangedEvent. */
+function onVolumesChanged(event) {
+  volume = gapi.hangout.av.
+      getParticipantVolume(gapi.hangout.getParticipantId());
+}
+
+/** This may be called faster than framerate.
+ @param {Object} event a gapi.hangout.av.effects.FaceTrackingData. */
+function onFaceTrackingDataChanged(event) {
+  try {
+    lastEvent = event;
+    if (!event.hasFace) {
+      return;
+    }
+
+    lastRoll.unshift(event.roll);
+    lastRoll.pop();
+    lastPan.unshift(event.pan);
+    lastPan.pop();
+    lastTilt.unshift(event.tilt);
+    lastTilt.pop();
+
+    var dist = Math.sqrt(
+        (event.leftEye.x - event.noseTip.x) *
+            (event.leftEye.x - event.noseTip.x) +
+                (event.leftEye.y - event.noseTip.y) *
+                    (event.leftEye.y - event.noseTip.y));
+
+    lastScale.unshift(dist);
+    lastScale.pop();
+
+    lastX.unshift(event.noseTip.x);
+    lastX.pop();
+
+    mouth.scale.y = 1 + volume * 0.4;
+    mouth.scale.x = 1 + volume * 0.10;
+  } catch (e) {
+    console.log('ERROR');
+    console.log(e);
+  }
+}
+
+function startHeadTracking() {
+  console.log('Started head tracking');
+
+  // Listen for face motion
+  gapi.hangout.av.effects.onFaceTrackingDataChanged.add(
+      onFaceTrackingDataChanged);
+  // Listen for volume changed
+  gapi.hangout.av.onVolumesChanged.add(onVolumesChanged);
+}
+
+function initGadget() {
+  // When API is ready...
+  gapi.hangout.onApiReady.add(
+      function(eventObj) {
+        if (eventObj.isApiReady) {
+          // Draw 3D things
+          initScene();
+          // Add event listeners
+          startHeadTracking();
+          // Set up 5-frame smoothing
+          setupWindows(5);
+          // Start rendering
+          animate();
+        }
+    });
+}
+
+// Wait for gadget to load.
+gadgets.util.registerOnLoadHandler(initGadget);
+</script>
+
+]]></Content></Module>
