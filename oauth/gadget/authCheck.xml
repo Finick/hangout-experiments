@@ -22,7 +22,7 @@
     <![CDATA[
 
 
-   <script src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.0"></script>
+   <script src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.1"></script>
 	<p>
     	<button id="authorize-button" style="visibility: hidden">Authorize</button>
     	<button id="token-button" style="visibility: hidden">Show token</button>
