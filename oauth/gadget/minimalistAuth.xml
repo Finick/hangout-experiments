@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+<!-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
+* use this file except in compliance with the License. You may obtain a copy of
+* the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+* License for the specific language governing permissions and limitations under
+* the License
+ -->
+
+  <ModulePrefs title="Your App Name">
+    <Require feature="rpc"/>
+    <Require feature="views"/>
+    <Require feature="locked-domain"/>
+  </ModulePrefs>
+  <Content type="html">
+    <![CDATA[
+	   
+<script src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.1"></script>
+
+<p>Your access token will be automatically retrieved and displayed here.</p>
+
+<p><i>Be sure to create an OAuth2 Client ID for your project or this will fail.</i></p>
+
+<h2>Your token: </h2>
+	   
+<div id='token'>NO TOKEN YET</div>
+
+<script>
+var scopes = ['https://www.googleapis.com/auth/plus.me',
+              'https://www.googleapis.com/auth/hangout.av',
+              'https://www.googleapis.com/auth/hangout.participants'];
+
+
+/** Run authorization call in either with or without popup
+ * @param {boolean} isImmediate Use immedate mode for authorization.
+ */
+function checkAuth(isImmediate) {
+  console.log('checking auth');
+
+  // Pass in a null client id; the gadget container will replace this
+  // with a generated one.
+  // HOWEVER!  You must go through the process of creating a client id
+  // associated with this hangout app in the Google API console.
+  gapi.auth.authorize({client_id: null,
+                       scope: scopes,
+                       immediate: isImmediate},
+                      handleAuthResult);
+}
+
+function handleAuthResult(authResult) {
+  var tokenButton = document.getElementById('token-button');
+
+  if (authResult) {
+    var div = document.getElementById('token');
+
+    div.innerHTML = '<p>' + gapi.auth.getToken().access_token + '</p>';
+  } else {
+    console.log('ERROR:  No auth result.');
+  }
+}
+
+function onClientReady() {
+  gapi.hangout.onApiReady.add(
+      function(event) {
+        console.log(event);
+        window.setTimeout(function() { checkAuth(true); }, 1);
+      });
+}
+</script>
+
+<script src="https://apis.google.com/js/api.js"></script>
+<script>
+  // Note that we load only the auth library, rather than
+  // the entire client library.
+  gapi.load('auth', onClientReady);
+</script>
+   
+    ]]>
+  </Content>
+</Module>
+
+
