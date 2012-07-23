@@ -48,6 +48,6 @@ https://developers.google.com/+/hangouts/getting-started
 If you've found a bug or have questions please visit our developer
 forum:
 
-https://devsite.googleplex.com/+/support
+https://developers.google.com/+/support
 
 
