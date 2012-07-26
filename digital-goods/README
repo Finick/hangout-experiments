@@ -1,0 +1,76 @@
+# Digital Goods in a Hangout
+
+This project demonstrate how to use the Google Wallet for Digital
+Doods API inside a Hangout App. It is a simple App Engine Python
+project that depends on
+[hangoutiframer](http://hangoutiframer.appspot.com)
+to serve the app within an iframe.
+
+## Required knowledge
+
+1. Basic understanding of Python on App Engine. See the [App Engine
+documentation](https://developers.google.com/appengine/docs/python/gettingstartedpython27/)
+for more information.
+
+2. Basic understanding of the Payments API. See the [Google Wallet
+documentation](https://developers.google.com/in-app-payments/) for
+more information.
+
+## Getting Started
+
+1. Create a new project on appspot.com
+
+2. Update the App Name in app-engine/app.yaml, then deploy the app.  (Refer the to the App Engine documentation on how to deploy.)
+
+3. Verify your app is serving by navigating to, where 'myapp' is the name of yoru appspot project.
+
+    https://myapp.appspot.com/iframer
+
+4. Get your Seller ID and Seller Secret at
+https://sandbox.google.com/checkout/customer/gadget/inapp/developersignup.html
+and update them in app-engine/sellerinfo.py
+
+5. Create an App in the Google+ APIs console.
+
+6. Turn on "Google+ Hangout APIs" in the Services tab.
+
+7. In the "Hangouts" tab, use the following URL, where 'myapp' is the app you created in steps 1 & 2:
+
+    https://hangoutiframer.appspot.com/forward/v0.4?u=https://myapp.appspot.com/iframer
+
+8. Hit "Save" at the bottom of the page.
+
+9. Click on "Enter a Hangout" to launch the app.  If your app does not start, see the [hangoutiframer documentation](http://hangoutiframer.appspot.com).
+
+10. Click "Ajax Purchase" to begin the purchase flow.
+
+11. It is recommended that you use a [test credit
+card](https://developers.google.com/in-app-payments/docs/testing) even
+though the app is running in sandbox.
+
+## Moving to Production
+
+To switch to production, you need to change the configuration in your JavaScript to:
+
+<pre><code>
+google.load('payments', '1.0', {
+  'packages': ['production_config']
+});
+</code></pre>
+
+You'll also want to handle postbacks. See the [Google Wallet
+documentation](https://developers.google.com/in-app-payments/docs/postback)
+for more details.
+
+## Getting Help
+
+For basic help getting a Hangout App running, read the [Getting
+Started
+guide](https://developers.google.com/+/hangouts/getting-started).
+
+For help with Google Wallet, see the [Google Wallet
+documentation](https://developers.google.com/in-app-payments/docs/postback)
+for more details.
+
+If you've found a bug or have questions please visit our [developer
+forum](https://developers.google.com/+/)

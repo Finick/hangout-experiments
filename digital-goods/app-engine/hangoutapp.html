@@ -1,0 +1,76 @@
+<!-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License
+ -->
+<html>
+  <head>
+    <script src="//hangoutsapi.talkgadget.google.com/talkgadget/apps/gadgets/js/rpc.js"></script>
+    <script src="//talkgadget.google.com/hangouts/_/api/hangout.js?v=1.1"></script>
+    <script src="//www.google.com/jsapi"></script>
+
+    <script>
+var resultDiv;
+            
+var ajaxPurchase = function() {
+    var name, desc, price;
+
+    name = encodeURIComponent(document.querySelector('#name').value);
+    desc = encodeURIComponent(document.querySelector('#desc').value);
+    price = encodeURIComponent(document.querySelector('#price').value);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'ajax?name=' + name + '&desc=' + desc + '&price=' + price);
+
+    xhr.onload = function(e) {
+        var data = this.response;
+        goog.payments.inapp.buy({
+            'jwt': data,
+            'success': successHandler,
+            'failure': failureHandler
+        });
+    }
+    xhr.send();
+}
+
+//Event Handlers
+var successHandler = function(purchaseActionStatus){
+    resultDiv.innerHTML = 'Purchase completed successfully!';
+}
+
+var failureHandler = function(purchaseActionStatus){
+    resultDiv.innerHTML = 'Purchase did not complete: ', purchaseActionStatus;
+}
+
+var registerEventHandlers = function() {
+    resultDiv = document.querySelector('#result');
+    resultDiv.innerHTML = 'payments are loaded';
+}
+
+var hangoutsReady = function() {
+    google.load('payments', '1.0', {
+        'packages' : ['sandbox_config'],
+        'callback' : registerEventHandlers
+    });
+}
+
+gapi.hangout.onApiReady.add(hangoutsReady);
+    </script>
+  </head>
+  <body>
+    <h2>Digital Goods for Google Wallet</h2>
+    <p>Name: <input type="text" id="name" placeholder="Slicer Dicer" value="Slicer Dicer"></p>
+    <p>Description: <input type="text" id="desc" placeholder="THE best salsa maker." value="THE best salsa maker."></p>
+    <p>Price (USD): <input type="text" id="price" placeholder="30.00" value="30.00"></p>
+    <button onClick="javascript:ajaxPurchase()">Ajax Purchase</button>
+    
+    <div id='result'>payments not loaded</div>
+  </body>
+</html>
