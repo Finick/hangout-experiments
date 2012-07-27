@@ -1,7 +1,7 @@
 # Digital Goods in a Hangout
 
-This project demonstrate how to use the Google Wallet for Digital
-Doods API inside a Hangout App. It is a simple App Engine Python
+This project demonstrates how to use the Google Wallet for Digital
+Goods API inside a Hangout App. It is a simple App Engine Python
 project that depends on
 [hangoutiframer](http://hangoutiframer.appspot.com)
 to serve the app within an iframe.
