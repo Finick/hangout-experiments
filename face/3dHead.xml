@@ -54,7 +54,7 @@
     	<Content type="html"><![CDATA[
     	  <!DOCTYPE html>
 
-<script src="https://talkgadget.google.com/hangouts/_/api/hangout.js?v=1.1" ></script>
+<script src="https://talkgadget.google.com/hangouts/_/api/hangout.js?v=1.4" ></script>
 <script src="https://mediakit001.appspot.com/static/three.js"></script>
 
 <script>
